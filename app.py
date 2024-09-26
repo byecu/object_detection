@@ -16,10 +16,12 @@ def play_live_camera():
 
     # Ensure image is in a suitable format for PIL
     try:
-        if isinstance(image, str):  # If the function returns a file path
+        # If image is a file path (string), open it directly
+        if isinstance(image, str):  
             uploaded_image = PIL.Image.open(image)
-        else:  # Assuming it returns raw image data
-            uploaded_image = PIL.Image.open(io.BytesIO(image))
+        else:  # Assuming it returns a BytesIO object
+            image_bytes = image.getvalue()  # Read bytes from the BytesIO object
+            uploaded_image = PIL.Image.open(io.BytesIO(image_bytes))  # Open as PIL Image
 
         # Convert PIL image to OpenCV format
         uploaded_image_cv = cv2.cvtColor(np.array(uploaded_image.convert('RGB')), cv2.COLOR_RGB2BGR)
@@ -30,6 +32,7 @@ def play_live_camera():
     
     except Exception as e:
         st.error(f"Error processing image: {e}")
+
 
 
 # OpenVINO Object Detection Model
