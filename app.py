@@ -36,7 +36,6 @@ def download_and_convert_model():
 
     # Convert model to OpenVINO IR format
     if not converted_model_path.exists():
-        trans_config_path = Path(ov_tf_front.__file__).parent / "ssd_v2_support.json"
         ov_model = mo.convert_model(
             tf_model_path,
             compress_to_fp16=(precision == "FP16"),
