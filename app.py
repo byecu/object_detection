@@ -10,6 +10,13 @@ import openvino as ov
 import notebook_utils as notebook_utils
 from camera_input_live import camera_input_live
 
+def play_live_camera():
+    image = camera_input_live()
+    uploaded_image = PIL.Image.open(image)
+    uploaded_image_cv = cv2.cvtColor(numpy.array(uploaded_image), cv2.COLOR_RGB2BGR)
+    visualized_image = utils.predict_image(uploaded_image_cv, conf_threshold)
+    st.image(visualized_image, channels = "BGR")
+    
 # OpenVINO Object Detection Model
 def download_and_convert_model():
     base_model_dir = Path("model")
