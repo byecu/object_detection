@@ -8,6 +8,7 @@ from pathlib import Path
 import collections
 import openvino as ov
 import notebook_utils as notebook_utils
+import tarfile
 
 # OpenVINO Object Detection Model
 def download_and_convert_model():
