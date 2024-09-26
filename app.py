@@ -9,6 +9,7 @@ import collections
 import openvino as ov
 import notebook_utils as notebook_utils
 import tarfile
+import openvino.tools.mo as mo
 
 # OpenVINO Object Detection Model
 def download_and_convert_model():
