@@ -4,7 +4,6 @@ import cv2
 import numpy as np
 import io
 import time
-import utils
 from pathlib import Path
 import collections
 import openvino as ov
@@ -12,29 +11,11 @@ import notebook_utils as notebook_utils
 from camera_input_live import camera_input_live
 
 def play_live_camera():
-    # Capture live camera input
     image = camera_input_live()
-
-    # Ensure image is in a suitable format for PIL
-    try:
-        # If image is a file path (string), open it directly
-        if isinstance(image, str):  
-            uploaded_image = PIL.Image.open(image)
-        else:  # Assuming it returns a BytesIO object
-            image_bytes = image.getvalue()  # Read bytes from the BytesIO object
-            uploaded_image = PIL.Image.open(io.BytesIO(image_bytes))  # Open as PIL Image
-
-        # Convert PIL image to OpenCV format
-        uploaded_image_cv = cv2.cvtColor(np.array(uploaded_image.convert('RGB')), cv2.COLOR_RGB2BGR)
-
-        # Perform object detection
-        visualized_image = utils.predict_image(uploaded_image_cv, conf_threshold)
-        st.image(visualized_image, channels="BGR")
-    
-    except Exception as e:
-        st.error(f"Error processing image: {e}")
-
-
+    uploaded_image = PIL.Image.open(image)
+    uploaded_image_cv = cv2.cvtColor(numpy.array(uploaded_image), cv2.COLOR_RGB2BGR)
+    visualized_image = utils.predict_image(uploaded_image_cv, conf_threshold)
+    st.image(visualized_image, channels = "BGR")
 
 # OpenVINO Object Detection Model
 def download_and_convert_model():
@@ -140,34 +121,48 @@ temporary_location = None
 
 # Image Processing Section
 if source_radio == "IMAGE":
+    
     st.sidebar.header("Upload")
-    input_file = st.sidebar.file_uploader("Choose an image.", type=("jpg", "png"))
+    input = st.sidebar.file_uploader("Choose an image.", type=("jpg", "png"))
 
-    if input_file is not None:
-        uploaded_image = PIL.Image.open(input_file)
-        uploaded_image_cv = cv2.cvtColor(np.array(uploaded_image), cv2.COLOR_RGB2BGR)
-        visualized_image = utils.predict_image(uploaded_image_cv, conf_threshold=conf_threshold)
-        st.image(visualized_image, channels="BGR")
+    if input is not None:
+        
+            uploaded_image = PIL.Image.open(input)
+            uploaded_image_cv = cv2.cvtColor(numpy.array(uploaded_image), cv2.COLOR_RGB2BGR)
+            visualized_image = utils.predict_image(uploaded_image_cv, conf_threshold = conf_threshold)
+            st.image(visualized_image, channels = "BGR")
+        
     else:
-        st.image("assets/sample_image.jpg")
-        st.write("Click on 'Browse Files' in the sidebar to run inference on an image.")
+    
+            st.write("Click on 'Browse Files' in the sidebar to run inference on an image.")
 
-# Video or Webcam Processing Section
-elif source_radio in ["VIDEO", "WEBCAM"]:
-    if source_radio == "VIDEO":
-        st.sidebar.header("Upload")
-        input_file = st.sidebar.file_uploader("Choose a video.", type=("mp4"))
+input = None
 
-        if input_file is not None:
-            g = io.BytesIO(input_file.read())
-            temporary_location = "upload.mp4"
-            with open(temporary_location, "wb") as out:
-                out.write(g.read())
+temporary_location = None
 
-            run_object_detection(temporary_location, conf_threshold)
-        else:
-            st.video("assets/sample_video.mp4")
-            st.write("Click on 'Browse Files' to run inference on a video.")
+if source_radio == "VIDEO":
+    st.sidebar.header("Upload")
+    input = st.sidebar.file_uploader("Choose an video.", type=("mp4"))
 
-    elif source_radio == "WEBCAM":
-        play_live_camera()
+    if input is not None:
+        
+        g = io.BytesIO(input.read())
+        temporary_location = "upload.mp4"
+
+        with open(temporary_location, "wb") as out:
+            out.write(g.read())
+
+        out.close()
+
+    if temporary_location is not None:
+        
+        play_video(temporary_location)
+        if st.button("Replay", type="primary"):
+            pass
+
+    else:
+        
+        st.write("Click on 'Browse Files' in the sidebar to run inference on an video.")
+
+if source_radio == "WEBCAM":
+    play_live_camera()
