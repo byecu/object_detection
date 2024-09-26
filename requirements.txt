@@ -1,6 +1,9 @@
-openvino-dev[all]==2022.3
-opencv-python==4.8.0
-Pillow==9.2.0
-streamlit==1.25.0
-numpy==1.24.0
-notebook-utils==0.3.0
+opencv-python-headless==4.10.0.84
+streamlit==1.36.0
+pillow==10.4.0
+numpy==1.26.4
+Python-IO==0.3
+openvino==2024.3.0
+matplotlib==3.9.1
+streamlit-camera-input-live==0.2.0
+moviepy==2.0.0.dev2
