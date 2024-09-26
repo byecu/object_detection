@@ -122,7 +122,6 @@ if source_radio == "IMAGE":
         visualized_image = utils.predict_image(uploaded_image_cv, conf_threshold=conf_threshold)
         st.image(visualized_image, channels="BGR")
     else:
-        st.image("assets/sample_image.jpg")
         st.write("Click on 'Browse Files' in the sidebar to run inference on an image.")
 
 # Video or Webcam Processing Section
@@ -139,7 +138,6 @@ elif source_radio in ["VIDEO", "WEBCAM"]:
 
             run_object_detection(temporary_location, conf_threshold)
         else:
-            st.video("assets/sample_video.mp4")
             st.write("Click on 'Browse Files' to run inference on a video.")
 
     elif source_radio == "WEBCAM":
