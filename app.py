@@ -120,36 +120,26 @@ conf_threshold = float(st.sidebar.slider("Select the Confidence Threshold", 10, 
 input_file = None
 temporary_location = None
 
-# Image Processing Section
-if source_radio == "IMAGE":
-    st.sidebar.header("Upload")
-    input_file = st.sidebar.file_uploader("Choose an image.", type=("jpg", "png"))
+def play_live_camera(uploaded_image):
+    if uploaded_image is None:
+        print("No image uploaded.")
+        return
 
-    if input_file is not None:
-        uploaded_image = PIL.Image.open(input_file)
-        uploaded_image_cv = cv2.cvtColor(np.array(uploaded_image), cv2.COLOR_RGB2BGR)
-        visualized_image = utils.predict_image(uploaded_image_cv, conf_threshold=conf_threshold)
-        st.image(visualized_image, channels="BGR")
-    else:
-        st.image("assets/sample_image.jpg")
-        st.write("Click on 'Browse Files' in the sidebar to run inference on an image.")
-
-# Video or Webcam Processing Section
-elif source_radio in ["VIDEO", "WEBCAM"]:
-    if source_radio == "VIDEO":
-        st.sidebar.header("Upload")
-        input_file = st.sidebar.file_uploader("Choose a video.", type=("mp4"))
-
-        if input_file is not None:
-            g = io.BytesIO(input_file.read())
-            temporary_location = "upload.mp4"
-            with open(temporary_location, "wb") as out:
-                out.write(g.read())
-
-            run_object_detection(temporary_location, conf_threshold)
+    try:
+        # Convert uploaded image to OpenCV format
+        if isinstance(uploaded_image, Image.Image):  # If it's a PIL Image
+            uploaded_image_cv = cv2.cvtColor(np.array(uploaded_image.convert('RGB')), cv2.COLOR_RGB2BGR)
         else:
-            st.video("assets/sample_video.mp4")
-            st.write("Click on 'Browse Files' to run inference on a video.")
+            uploaded_image_cv = cv2.cvtColor(np.array(uploaded_image), cv2.COLOR_RGB2BGR)
 
+    except Exception as e:
+        print(f"Error converting image: {e}")
+        return
+
+    # Now you can process uploaded_image_cv as needed
+    cv2.imshow('Uploaded Image', uploaded_image_cv)
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
+    
     elif source_radio == "WEBCAM":
         play_live_camera()
