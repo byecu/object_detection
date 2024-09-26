@@ -11,11 +11,25 @@ import notebook_utils as notebook_utils
 from camera_input_live import camera_input_live
 
 def play_live_camera():
+    # Capture live camera input
     image = camera_input_live()
-    uploaded_image = PIL.Image.open(image)
-    uploaded_image_cv = cv2.cvtColor(numpy.array(uploaded_image), cv2.COLOR_RGB2BGR)
-    visualized_image = utils.predict_image(uploaded_image_cv, conf_threshold)
-    st.image(visualized_image, channels = "BGR")
+
+    # Ensure image is in a suitable format for PIL
+    try:
+        if isinstance(image, str):  # If the function returns a file path
+            uploaded_image = PIL.Image.open(image)
+        else:  # Assuming it returns raw image data
+            uploaded_image = PIL.Image.open(io.BytesIO(image))
+
+        # Convert PIL image to OpenCV format
+        uploaded_image_cv = cv2.cvtColor(np.array(uploaded_image.convert('RGB')), cv2.COLOR_RGB2BGR)
+
+        # Perform object detection
+        visualized_image = utils.predict_image(uploaded_image_cv, conf_threshold)
+        st.image(visualized_image, channels="BGR")
+    
+    except Exception as e:
+        st.error(f"Error processing image: {e}")
 
 
 # OpenVINO Object Detection Model
