@@ -119,51 +119,36 @@ conf_threshold = float(st.sidebar.slider("Select the Confidence Threshold", 10, 
 input_file = None
 temporary_location = None
 
+# Image Processing Section
 if source_radio == "IMAGE":
-    
     st.sidebar.header("Upload")
-    input = st.sidebar.file_uploader("Choose an image.", type=("jpg", "png"))
+    input_file = st.sidebar.file_uploader("Choose an image.", type=("jpg", "png"))
 
-    if input is not None:
-        
-            uploaded_image = PIL.Image.open(input)
-            uploaded_image_cv = cv2.cvtColor(numpy.array(uploaded_image), cv2.COLOR_RGB2BGR)
-            visualized_image = utils.predict_image(uploaded_image_cv, conf_threshold = conf_threshold)
-            st.image(visualized_image, channels = "BGR")
-        
+    if input_file is not None:
+        uploaded_image = PIL.Image.open(input_file)
+        uploaded_image_cv = cv2.cvtColor(np.array(uploaded_image), cv2.COLOR_RGB2BGR)
+        visualized_image = utils.predict_image(uploaded_image_cv, conf_threshold=conf_threshold)
+        st.image(visualized_image, channels="BGR")
     else:
-    
-            st.image("assets/sample_image.jpg")
-            st.write("Click on 'Browse Files' in the sidebar to run inference on an image.")
+        st.image("assets/sample_image.jpg")
+        st.write("Click on 'Browse Files' in the sidebar to run inference on an image.")
 
-input = None
+# Video or Webcam Processing Section
+elif source_radio in ["VIDEO", "WEBCAM"]:
+    if source_radio == "VIDEO":
+        st.sidebar.header("Upload")
+        input_file = st.sidebar.file_uploader("Choose a video.", type=("mp4"))
 
-temporary_location = None
+        if input_file is not None:
+            g = io.BytesIO(input_file.read())
+            temporary_location = "upload.mp4"
+            with open(temporary_location, "wb") as out:
+                out.write(g.read())
 
-if source_radio == "VIDEO":
-    st.sidebar.header("Upload")
-    input = st.sidebar.file_uploader("Choose an video.", type=("mp4"))
+            run_object_detection(temporary_location, conf_threshold)
+        else:
+            st.video("assets/sample_video.mp4")
+            st.write("Click on 'Browse Files' to run inference on a video.")
 
-    if input is not None:
-        
-        g = io.BytesIO(input.read())
-        temporary_location = "upload.mp4"
-
-        with open(temporary_location, "wb") as out:
-            out.write(g.read())
-
-        out.close()
-
-    if temporary_location is not None:
-        
-        play_video(temporary_location)
-        if st.button("Replay", type="primary"):
-            pass
-
-    else:
-        
-        st.video("assets/sample_video.mp4")
-        st.write("Click on 'Browse Files' in the sidebar to run inference on an video.")
-
-if source_radio == "WEBCAM":
-    play_live_camera()
+    elif source_radio == "WEBCAM":
+        run_object_detection(0, conf_threshold)
