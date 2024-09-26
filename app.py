@@ -6,10 +6,9 @@ import io
 import time
 from pathlib import Path
 import collections
-from openvino.tools import mo
 import openvino as ov
 import notebook_utils as notebook_utils
-from openvino.tools.mo.front import tf as ov_tf_front
+
 
 # OpenVINO Object Detection Model
 def download_and_convert_model():
