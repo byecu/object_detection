@@ -7,9 +7,8 @@ import time
 from pathlib import Path
 import collections
 import openvino as ov
-import notebook_utils as utils
-from camera_input_live import camera_input_live
-    
+import notebook_utils as notebook_utils
+
 # OpenVINO Object Detection Model
 def download_and_convert_model():
     base_model_dir = Path("model")
@@ -99,12 +98,6 @@ def run_object_detection(video_source, conf_threshold):
 
     camera.release()
 
-# Live Webcam
-def play_live_camera():
-    image = camera_input_live()
-    uploaded_image = PIL.Image.open(image)
-    uploaded_image_cv = cv2.cvtColor(np.array(uploaded_image), cv2.COLOR_RGB2BGR)
-
 # Streamlit Interface
 st.set_page_config(page_title="Facial & Object Detection", page_icon=":sun_with_face:", layout="centered", initial_sidebar_state="expanded")
 
@@ -123,6 +116,14 @@ if source_radio == "IMAGE":
     st.sidebar.header("Upload")
     input_file = st.sidebar.file_uploader("Choose an image.", type=("jpg", "png"))
 
+    if input_file is not None:
+        uploaded_image = PIL.Image.open(input_file)
+        uploaded_image_cv = cv2.cvtColor(np.array(uploaded_image), cv2.COLOR_RGB2BGR)
+        visualized_image = utils.predict_image(uploaded_image_cv, conf_threshold=conf_threshold)
+        st.image(visualized_image, channels="BGR")
+    else:
+        st.image("assets/sample_image.jpg")
+        st.write("Click on 'Browse Files' in the sidebar to run inference on an image.")
 
 # Video or Webcam Processing Section
 elif source_radio in ["VIDEO", "WEBCAM"]:
@@ -142,4 +143,4 @@ elif source_radio in ["VIDEO", "WEBCAM"]:
             st.write("Click on 'Browse Files' to run inference on a video.")
 
     elif source_radio == "WEBCAM":
-        play_live_camera()
+        run_object_detection(0, conf_threshold)
