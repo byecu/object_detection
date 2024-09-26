@@ -10,7 +10,7 @@ import openvino as ov
 import notebook_utils as notebook_utils
 import tarfile
 import subprocess
-import openvino.tools.mo as mo
+
 
 
 # OpenVINO Object Detection Model
