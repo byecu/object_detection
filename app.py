@@ -10,20 +10,12 @@ import openvino as ov
 import notebook_utils as notebook_utils
 from camera_input_live import camera_input_live
 
-def play_video(video_source):
-    camera = cv2.VideoCapture(video_source)
-
-    st_frame = st.empty()
-    while(camera.isOpened()):
-        ret, frame = camera.read()
-
-        if ret:
-            visualized_image = utils.predict_image(frame, conf_threshold)
-            st_frame.image(visualized_image, channels = "BGR")
-
-        else:
-            camera.release()
-            break
+def play_live_camera():
+    image = camera_input_live()
+    uploaded_image = PIL.Image.open(image)
+    uploaded_image_cv = cv2.cvtColor(numpy.array(uploaded_image), cv2.COLOR_RGB2BGR)
+    visualized_image = utils.predict_image(uploaded_image_cv, conf_threshold)
+    st.image(visualized_image, channels = "BGR")
 
 
 # OpenVINO Object Detection Model
