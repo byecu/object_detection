@@ -7,7 +7,7 @@ import time
 from pathlib import Path
 import collections
 import openvino as ov
-import notebook_utils as notebook_utils
+import notebook_utils as utils
 from camera_input_live import camera_input_live
 
 def play_live_camera():
