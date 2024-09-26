@@ -8,6 +8,22 @@ from pathlib import Path
 import collections
 import openvino as ov
 import notebook_utils as notebook_utils
+from camera_input_live import camera_input_live
+
+def play_video(video_source):
+    camera = cv2.VideoCapture(video_source)
+
+    st_frame = st.empty()
+    while(camera.isOpened()):
+        ret, frame = camera.read()
+
+        if ret:
+            visualized_image = utils.predict_image(frame, conf_threshold)
+            st_frame.image(visualized_image, channels = "BGR")
+
+        else:
+            camera.release()
+            break
 
 
 # OpenVINO Object Detection Model
@@ -144,4 +160,4 @@ elif source_radio in ["VIDEO", "WEBCAM"]:
             st.write("Click on 'Browse Files' to run inference on a video.")
 
     elif source_radio == "WEBCAM":
-        run_object_detection(0, conf_threshold)
+        play_live_camera()
