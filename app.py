@@ -44,6 +44,13 @@ def download_and_convert_model():
 
     return converted_model_path
 
+def play_live_camera():
+    image = camera_input_live()
+    uploaded_image = PIL.Image.open(image)
+    uploaded_image_cv = cv2.cvtColor(numpy.array(uploaded_image), cv2.COLOR_RGB2BGR)
+    visualized_image = utils.predict_image(uploaded_image_cv, conf_threshold)
+    st.image(visualized_image, channels = "BGR")
+
 # Function to process object detection results
 def process_results(frame, results, thresh=0.6):
     h, w = frame.shape[:2]
@@ -125,20 +132,22 @@ if source_radio == "IMAGE":
         st.write("Click on 'Browse Files' in the sidebar to run inference on an image.")
 
 # Video or Webcam Processing Section
-elif source_radio in ["VIDEO", "WEBCAM"]:
-    if source_radio == "VIDEO":
-        st.sidebar.header("Upload")
-        input_file = st.sidebar.file_uploader("Choose a video.", type=("mp4"))
+if source_radio == "VIDEO":
+    st.sidebar.header("Upload")
+    input_file = st.sidebar.file_uploader("Choose a video.", type=("mp4"))
 
-        if input_file is not None:
-            g = io.BytesIO(input_file.read())
-            temporary_location = "upload.mp4"
-            with open(temporary_location, "wb") as out:
-                out.write(g.read())
+    if input_file is not None:
+        g = io.BytesIO(input_file.read())
+        temporary_location = "upload.mp4"
+        with open(temporary_location, "wb") as out:
+            out.write(g.read())
 
-            run_object_detection(temporary_location, conf_threshold)
-        else:
-            st.write("Click on 'Browse Files' to run inference on a video.")
+        run_object_detection(temporary_location, conf_threshold)
+    else:
+        st.write("Click on 'Browse Files' to run inference on a video.")
 
-    elif source_radio == "WEBCAM":
-        run_object_detection(0, conf_threshold)
+elif source_radio == "WEBCAM":
+    run_object_detection(0, conf_threshold)
+
+if source_radio == "WEBCAM":
+    play_live_camera()
