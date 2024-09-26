@@ -151,4 +151,4 @@ elif source_radio in ["VIDEO", "WEBCAM"]:
             st.write("Click on 'Browse Files' to run inference on a video.")
 
     elif source_radio == "WEBCAM":
-        run_object_detection(0, conf_threshold)
+        play_live_camera()
